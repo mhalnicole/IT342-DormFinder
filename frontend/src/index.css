@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═════════════════════════════════════════════════════════
+   DORMFINDER — Linear / Raycast Dark Architecture
+   Color Direction: Deep Obsidian Slate + Emerald & Amber
+   Base Background: #0a0d14
+   Card Background: #111726
+   Card Highlight:  #182238
+   Borders:         #232f48
+═════════════════════════════════════════════════════════ */
+
+:root {
+  --bg-main:       #0a0d14;
+  --bg-surface:    #111726;
+  --bg-surface-2:  #182238;
+  --border-dim:    #1c263c;
+  --border-mid:    #263554;
+  --border-bright: #3b507d;
+  
+  --emerald:       #10b981;
+  --emerald-glow:  rgba(16, 185, 129, 0.15);
+  --amber:         #f59e0b;
+  --amber-glow:    rgba(245, 158, 11, 0.15);
+  --blue:          #3b82f6;
+  --blue-glow:     rgba(59, 130, 246, 0.15);
+  --coral:         #ef4444;
+  
+  --text-pure:     #f8fafc;
+  --text-high:     #e2e8f0;
+  --text-mid:      #94a3b8;
+  --text-dim:      #64748b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  background-color: var(--bg-main) !important;
+  color: var(--text-high) !important;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Subtle architectural grid pattern */
+.slate-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Solid Obsidian Cards */
+.obsidian-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-mid);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.36);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.obsidian-card:hover {
+  border-color: var(--border-bright);
+}
+
+.obsidian-card-hover:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Pill Badges */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1px solid;
+}
+
+.pill-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.pill-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.pill-blue {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.pill-coral {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Form Inputs */
+.slate-input {
+  width: 100%;
+  background: #0f1523;
+  border: 1px solid #23314d;
+  border-radius: 10px;
+  color: #f8fafc;
+  font-size: 13px;
+  padding: 10px 14px;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.slate-input::placeholder {
+  color: #64748b;
+}
+
+.slate-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+  background: #131c30;
+}
+
+.slate-input-icon {
+  padding-left: 38px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0a0d14; }
+::-webkit-scrollbar-thumb { background: #263554; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #3b507d; }
+
+/* Buttons */
+.btn-emerald {
+  background: #10b981;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn-emerald:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+.btn-emerald:active {
+  transform: translateY(0);
+}
+
+.btn-amber {
+  background: #f59e0b;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn-amber:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+.btn-blue {
+  background: #3b82f6;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn-blue:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
