@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Lock, Mail, AlertCircle, ArrowRight, GraduationCap, Building, Shield, CheckCircle2 } from 'lucide-react';
+import { LogIn, Lock, Mail, AlertCircle, ArrowRight, GraduationCap, Building, Shield, CheckCircle2, KeyRound } from 'lucide-react';
 
 export default function Login() {
+  const location = useLocation();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
+  const [successMsg, setSuccessMsg] = useState(location.state?.message || '');
   const [loading, setLoading]   = useState(false);
 
   const { login } = useAuth();
@@ -39,15 +41,12 @@ export default function Login() {
 
   return (
     <div style={{ minHeight: 'calc(100vh - 60px)', display: 'flex', background: '#0a0d14' }}>
-
-      {/* ── LEFT SHOWCASE PANEL ── */}
       <div className="hidden lg:flex slate-grid" style={{
         flex: '0 0 44%', position: 'relative', overflow: 'hidden', padding: '64px 52px',
         flexDirection: 'column', justifyContent: 'space-between',
         background: '#0d1320', borderRight: '1px solid #1c273e'
       }}>
         <div>
-          {/* Brand header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
             <div style={{ width: 42, height: 42, borderRadius: 12, background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(16,185,129,0.4)' }}>
               <LogIn size={22} color="#ffffff" />
@@ -60,7 +59,6 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Value Prop */}
           <div style={{ marginBottom: 44 }}>
             <span className="pill-badge pill-emerald" style={{ marginBottom: 16 }}>
               Student Accommodation Discovery
@@ -73,7 +71,6 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Highlights */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
               { title: 'Verified Accreditation', desc: 'Pre-screened boarding houses and active business permits' },
@@ -93,7 +90,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Footer info box */}
         <div style={{ padding: '16px 20px', borderRadius: 12, background: '#121a2c', border: '1px solid #1f2d48' }}>
           <p style={{ fontSize: 12.5, color: '#94a3b8', lineHeight: 1.6 }}>
             "Simplifying the student housing search with transparent rates, verified vacancy, and direct viewing scheduling."
@@ -102,7 +98,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* ── RIGHT LOGIN FORM ── */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', background: '#0a0d14' }}>
         <div style={{ width: '100%', maxWidth: 400 }}>
 
@@ -111,7 +106,13 @@ export default function Login() {
             <p style={{ fontSize: 14, color: '#94a3b8' }}>Access your role-based student or landlord portal</p>
           </div>
 
-          {/* Error Message */}
+          {successMsg && (
+            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#34d399', fontSize: 13 }}>
+              <CheckCircle2 size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
           {error && (
             <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', fontSize: 13 }}>
               <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
@@ -121,8 +122,6 @@ export default function Login() {
 
           <div className="obsidian-card" style={{ padding: '28px 26px', background: '#111726' }}>
             <form onSubmit={handleSubmit}>
-              
-              {/* Email */}
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 7 }}>
                   Email Address
@@ -140,11 +139,20 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Password */}
               <div style={{ marginBottom: 22 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 7 }}>
-                  Password
-                </label>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                    Password
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    style={{ fontSize: 12, color: '#10b981', fontWeight: 600, textDecoration: 'none' }}
+                    onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+                    onMouseLeave={e => e.target.style.textDecoration = 'none'}
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <div style={{ position: 'relative' }}>
                   <Lock size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748b', pointerEvents: 'none' }} />
                   <input
@@ -158,7 +166,6 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
@@ -169,7 +176,6 @@ export default function Login() {
               </button>
             </form>
 
-            {/* Quick Demo Pre-Seeded Switcher */}
             <div style={{ margin: '24px 0 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ flex: 1, height: 1, background: '#1c273e' }} />
               <span style={{ fontSize: 10, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Quick Demo Accounts</span>
@@ -197,7 +203,6 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Footer link */}
           <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: '#64748b' }}>
             Need an account?{' '}
             <Link to="/register" style={{ color: '#10b981', fontWeight: 700, textDecoration: 'none' }}
