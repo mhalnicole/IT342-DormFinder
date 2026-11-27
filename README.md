@@ -1,57 +1,54 @@
 # DormFinder: Student Boarding House and Dormitory Listing System
 ### IT342 - Systems Integration and Architecture 1 | Cebu Institute of Technology - University
-**Project Increment 1: User Accounts and Authentication**  
+**Project Increment 2: User Profile and Password Management**  
 **Author:** Mhalia Nicole P. Paton-og (`mhals`)  
 **Academic Term:** First Semester, A.Y. 2026-2027  
+**Official Completion Report:** [`docs/Increment-2-Completion-Report.pdf`](docs/Increment-2-Completion-Report.pdf)  
 
 ---
 
 ## 1. Project Overview & Scope Alignment
 **DormFinder** is a centralized web application designed to connect university students of Cebu Institute of Technology - University (CIT-U) with local accredited boarding house landlords and dormitory operators in surrounding barangays (Sambag 1, Sambag 2, Punta Princesa, Basak San Nicolas, and Guadalupe).
 
-This repository contains the complete implementation of **Project Increment 1 (User Accounts and Authentication)**, fully aligned with the approved **Software Requirements Specification (SRS)**:
+This repository contains the complete, integrated implementation of **Project Increment 1 (User Accounts and Authentication)** and **Project Increment 2 (User Profile and Password Management)**, strictly aligned with the approved **Software Requirements Specification (SRS)**:
 - **Feature 1:** User Authentication and Role-Based Access Control (FR-001 to FR-006)
+- **Feature 1 Extension:** Profile Management, Self-Service Password Reset, and Authenticated Password Change
 - **Role-Based Portals:** Separate, dedicated interfaces for **Students**, **Landlords**, and **Administrators**
 - **Architecture:** Full three-tier integration (ReactJS Frontend + Spring Boot 3 Backend + MariaDB/MySQL Database)
 
 ---
 
-## 2. Implemented Features
+## 2. Implemented Features Summary
 
-### 1. User Account Creation (Registration)
-- Dual-role registration workflow supporting **College Students** and **Boarding House Landlords**.
-- **Field Validation:** Strict validation of required fields (first name, last name, valid email format, password minimum length >= 6 characters, phone number).
-- **SRS Entity Data Collection:**
-  - **Students (`STUDENT_PROFILES`):** Student ID Number (e.g., `23-0065-102`), Course/Academic Program (`BSIT`, `BSCS`, `BSCE`, etc.), Year Level, and Emergency Contact.
-  - **Landlords (`LANDLORD_PROFILES`):** Business Permit / Clearance Number, Office / Physical Address.
-- **Duplicate Prevention:** Rejects duplicate email registrations with an HTTP 409 Conflict status.
-- **Password Hashing:** Passwords are salted and hashed using **BCrypt (strength 12)** prior to database insertion.
-- **Transaction Safety:** Uses `@Transactional` to guarantee both user and role profile records are created atomically in MySQL.
+### Increment 1 Core Features (Preserved & Fully Operational)
+1. **User Account Creation (Registration):**
+   - Dual-role registration workflow supporting **College Students** and **Boarding House Landlords**.
+   - Input field validation, duplicate account prevention, and password hashing with **BCrypt (strength 12)**.
+   - Atomic database persistence across relational tables (`users`, `student_profiles`, `landlord_profiles`).
+2. **User Login and Logout:**
+   - Authenticates credentials via Spring Security's `AuthenticationManager`.
+   - Issues cryptographic **HMAC-SHA256 JWT tokens** valid for 24 hours.
+   - Clean 401 Unauthorized handling, `/api/auth/me` session hydration, and token-clearing logout.
+3. **Role-Based User Dashboards:**
+   - Dedicated portals for Student (`/student/dashboard`), Landlord (`/landlord/dashboard`), and Admin (`/admin/dashboard`).
+   - Protected client routing (`ProtectedRoute`, `RoleRoute`) and backend method-level security (`@PreAuthorize`).
 
-### 2. User Login and Logout
-- **Authentication:** Authenticates credentials via Spring Security's `AuthenticationManager` and `CustomUserDetailsService`.
-- **JWT Session Management:** Issues a signed cryptographic JSON Web Token (HMAC-SHA256) valid for 24 hours.
-- **Error Handling:** Returns clear, descriptive error messages for invalid credentials (HTTP 401) or deactivated accounts (HTTP 403).
-- **Session Verification:** `GET /api/auth/me` validates the token on application refresh, restoring user identity.
-- **Secure Logout:** Terminates the session, purges the stored JWT from `localStorage`, and immediately locks protected routes.
-- **Backend Protection:** Spring Security filter chain (`JwtAuthenticationFilter`) guards all protected endpoints.
-
-### 3. Role-Based User Dashboards
-- **Student Dashboard (`/student/dashboard`):**
-  - Displays student name, School ID, Course, Year Level, and enrollment badge.
-  - Shows metrics: Active Viewing Requests (`0`), Saved Listings (`0`), CIT-U Proximity Target (`0.45 km`), and Account Standing.
-  - Features quick accommodation search bar and inspection inquiry preview.
-- **Landlord Dashboard (`/landlord/dashboard`):**
-  - Displays landlord name, Business Permit No., Office Address, and Accreditation Status (`VERIFIED` / `PENDING`).
-  - Shows metrics: Listed Properties, Room Capacity Units, and Pending Viewing Requests.
-  - Includes property registration teaser and viewing appointment inbox.
-- **Admin Dashboard (`/admin/dashboard`):**
-  - Displays system-wide metrics: Total Users, Total Students, Total Landlords, and Database Status.
-  - **Live User Governance Table:** Queries MySQL in real-time (`/api/admin/users`) displaying all registered accounts.
-  - **Account Governance Action:** Functional button to activate or deactivate user accounts (`PATCH /api/admin/users/{id}/toggle-status`).
-- **Access Control Enforcement:**
-  - **Frontend:** Protected routes and `RoleRoute` guards prevent unauthorized page visits (e.g., a student visiting `/admin/dashboard` is blocked with HTTP 403 Forbidden).
-  - **Backend:** `@PreAuthorize("hasRole('...')")` enforces RBAC on every controller method.
+### Increment 2 Core Features (User Profile and Password Management)
+1. **User Profile Management:**
+   - Authenticated users can view and edit their own profile information via `/profile` and their role dashboard tabs.
+   - **Student Profile:** In-place editing of first name, last name, mobile phone number, academic program/course, year level (1 to 5), and emergency contact.
+   - **Landlord Profile:** In-place editing of first name, last name, mobile phone number, business permit number, and office/management address.
+   - **Profile Isolation:** SecurityContext-backed user resolution guarantees users can only update their own records, preventing unauthorized profile modifications.
+2. **Reset Password (Forgot Password):**
+   - Accessible from the login screen (`/forgot-password`).
+   - Generates a cryptographically secure, single-use, 15-minute expiring token (`PasswordResetToken` table).
+   - Real-time token verification endpoint (`GET /api/auth/verify-reset-token`).
+   - Reset submission (`POST /api/auth/reset-password`) validates minimum 8-character length, enforces non-reuse of existing password, updates BCrypt hash, and marks token as used (`is_used = true`).
+3. **Change Password:**
+   - Authenticated users can change passwords from their profile or dashboard security tabs.
+   - Strictly verifies current password matching against the stored BCrypt hash.
+   - Enforces new password complexity and mismatch prevention.
+   - Invalidates previous authentication credentials immediately upon update.
 
 ---
 
@@ -61,9 +58,9 @@ This repository contains the complete implementation of **Project Increment 1 (U
 | :--- | :--- | :--- | :--- |
 | **Frontend** | ReactJS + Vite | 18.2 / 5.1 | Responsive Single-Page Application (SPA) |
 | **Routing & State**| React Router DOM + Context API | 6.x | Client-side routing, route guards, auth state |
-| **Icons & UI** | Lucide React + Tailwind CSS | 0.344 | Modern clean dashboard styling & iconography |
-| **Backend** | Spring Boot | 3.2.4 | RESTful web services & business logic |
-| **Security** | Spring Security + JJWT | 6.x / 0.11.5 | BCrypt hashing, JWT issuance & verification |
+| **Icons & UI** | Lucide React + Tailwind CSS | 0.344 | Modern clean dashboard styling and iconography |
+| **Backend** | Spring Boot | 3.2.4 | RESTful web services and business logic |
+| **Security** | Spring Security + JJWT | 6.x / 0.11.5 | BCrypt hashing, JWT issuance and token verification |
 | **Persistence** | Spring Data JPA / Hibernate | 3.2.4 | Object-Relational Mapping (ORM) |
 | **Database** | MariaDB / MySQL Server | 10.4 / 8.0 | Relational database (`localhost:3306`) |
 
@@ -78,8 +75,6 @@ The backend includes a `DataInitializer` that automatically seeds test accounts 
 | **ADMIN** | `admin@dormfinder.com` | `Admin@123` | System Administrator, CIT-U Housing Office |
 | **STUDENT** | `student@cit.edu` | `Student@123` | Juan Dela Cruz, ID: `23-0065-102`, BSIT Year 3 |
 | **LANDLORD** | `landlord@dormfinder.com` | `Landlord@123` | Maria Santos, Permit: `BP-CEBU-2026-9041`, Sambag 1 |
-
-> **Tip:** You can also register a brand-new Student or Landlord account through the **Create Account** page!
 
 ---
 
@@ -101,7 +96,7 @@ Open your MySQL or MariaDB command line (or phpMyAdmin / MySQL Workbench) and ru
 ```sql
 CREATE DATABASE IF NOT EXISTS dormfinder_db;
 ```
-> **Note:** The backend is configured in `backend/src/main/resources/application.properties` with default user `root` and empty password `""`. Update the password if your local MySQL instance has one.
+> **Note:** The backend is configured in `backend/src/main/resources/application.properties` with default user `root` and empty password `""`.
 
 ### Step 3: Run the Spring Boot Backend
 Open a terminal in the `backend` folder:
@@ -113,7 +108,7 @@ cd backend
 # Linux / macOS:
 ./mvnw spring-boot:run
 ```
-The backend will start on **`http://localhost:8080`**. Tables will be automatically created and pre-seeded.
+The backend starts on **`http://localhost:8080`**. Schema tables and seed accounts are initialized automatically.
 
 ### Step 4: Run the React Frontend
 Open a second terminal in the `frontend` folder:
@@ -122,19 +117,27 @@ cd frontend
 npm install
 npm run dev
 ```
-The frontend will start on **`http://localhost:5173`**.
+The frontend starts on **`http://localhost:5173`**.
 
 Open your browser and navigate to **`http://localhost:5173`**.
 
 ---
 
-## 📡 6. REST API Endpoints Overview
+## 6. REST API Endpoints Overview
 
 ### Public & Authentication Endpoints
 - `POST /api/auth/register` - Register a new Student or Landlord account
 - `POST /api/auth/login` - Authenticate credentials and receive a signed JWT
 - `GET /api/auth/me` - Validate active session token and retrieve current user info
 - `POST /api/auth/logout` - Terminate authenticated session
+- `POST /api/auth/forgot-password` - Request a password reset token for a registered email
+- `GET /api/auth/verify-reset-token` - Verify single-use reset token validity and expiry
+- `POST /api/auth/reset-password` - Reset password with verified token and new credentials
+
+### Authenticated User Profile & Security Endpoints
+- `GET /api/users/profile` - Retrieve current authenticated user's profile and credentials
+- `PUT /api/users/profile` - Update authenticated user's profile details and role attributes
+- `PUT /api/users/change-password` - Change password verifying current password and new password
 
 ### Protected Role-Based Endpoints
 - `GET /api/student/dashboard` - Retrieve student-specific metrics and profile (*Requires `ROLE_STUDENT`*)
@@ -145,5 +148,11 @@ Open your browser and navigate to **`http://localhost:5173`**.
 
 ---
 
-## 7. License & Academic Integrity
+## 7. Project Documentation
+- **Software Requirements Specification (SRS):** Prepared using CIT-U IT342 SRS specification.
+- **Project Increment 2 Completion Report:** Saved in [`docs/Increment-2-Completion-Report.pdf`](docs/Increment-2-Completion-Report.pdf) with full CRUD operation matrices, database models, file references, validation business rules, and high-resolution interface verification screenshots.
+
+---
+
+## 8. License & Academic Integrity
 Developed by **Mhalia Nicole P. Paton-og** for **IT342: Systems Integration and Architecture 1**, College of Computer Studies, Cebu Institute of Technology - University. All rights reserved.
